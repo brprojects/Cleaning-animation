@@ -1,6 +1,7 @@
 import turtle
 import time
 import numpy as np
+import random
 
 
 # Coordinates of windows in a 140 x 2 matrix
@@ -33,10 +34,10 @@ wn.register_shape("water.gif")
 
 
 class Windows(turtle.Turtle):
-    def __init__(self):
+    def __init__(self, shape):
         turtle.Turtle.__init__(self, visible=False)
         self.penup()
-        self.shape("circle")
+        self.shape(shape)
         self.color("red")
         self.shapesize(0.4, 0.4)
 
@@ -74,11 +75,11 @@ class Drone(turtle.Turtle):
 
     def move(self, i):
         if i > 4:
-            status_circles[i - 5].color("green")
+            status_shapes[i - 5].color("green")
         self.setpos(coords[i])
 
     def finish(self, i, j):
-        status_circles[i - 5 + j].color("green")
+        status_shapes[i - 5 + j].color("green")
         self.setpos(-200 + 50 * j, -280)
 
 
@@ -89,25 +90,34 @@ class Waterdrone(Drone):
 
     def move(self, i):
         if i > 0:
-            status_circles[i - 1].color("orange")
+            status_shapes[i - 1].color("orange")
         self.setpos(coords[i])
-        status_circles[i].color("blue")
+        status_shapes[i].color("blue")
 
     def finish(self, i):
-        status_circles[i - 1].color("orange")
+        status_shapes[i - 1].color("orange")
         self.setpos(150, -280)
 
 
 points = np.size(coords, 0)
 # points = 9
 
-# initialise circles
-status_circles = list()
+# initialise shapes
+status_shapes = list()
+dirtiness = np.random.random_sample(points)
+shape = [''] * points
+for i in range(len(dirtiness)):
+    if dirtiness[i] <= 0.85 :
+        shape[i] = "circle"
+    elif dirtiness[i] <= 0.95 and dirtiness[i] > 0.85 :
+        shape[i] = "square"
+    else:
+        shape[i] = "triangle"
 for i in range(points):
-    status_circles.append(Windows())
+    status_shapes.append(Windows(shape[i]))
 
-for i in range(len(status_circles)):
-    status_circles[i].start_position(coords[i, 0], coords[i, 1])
+for i in range(len(status_shapes)):
+    status_shapes[i].start_position(coords[i, 0], coords[i, 1])
 
 # initialise drones
 players = list()
