@@ -1,6 +1,8 @@
 # Animation for 3YP autonomous drone project
 
-## More info 
+## Cleaning animation
+Shows animation for basic cleaning of all the buildings' windows
 
-Need to still consider:
-making some edits
+## Cleaning animation scanner
+Shows animation of cleaning the buildings' windows with the verification scanner 
+drones picking up on still dirty windows
