@@ -28,7 +28,7 @@ wn.bgcolor("white")
 
 # Register shapes
 wn.register_shape("quadcopter.gif")
-# wn.register_shape("quadcopter2.gif")
+wn.register_shape("scanner.gif")
 wn.register_shape("water.gif")
 
 
@@ -81,6 +81,10 @@ class Drone(turtle.Turtle):
         status_shapes[i - 5 + j].color("green")
         self.setpos(-200 + 50 * j, -280)
 
+    def reclean(self, i):
+        status_shapes[i - 4].color("green")
+        self.setpos(coords[i - len(players) - 2])
+
 
 class Waterdrone(Drone):
     def __init__(self):
@@ -97,9 +101,55 @@ class Waterdrone(Drone):
         status_shapes[i - 1].color("orange")
         self.setpos(150, -280)
 
+    def reclean(self, i):
+        status_shapes[i].color("orange")
+        self.setpos(coords[i - len(players) - 2])
+        status_shapes[i - len(players) - 2].color("blue")
+    
+    def end_reclean(self,i):
+        status_shapes[i - len(players) - 2].color("orange")
+        self.setpos(coords[i+1])
+        status_shapes[i+1].color("blue")
+
+class Scanner(Drone):
+    def __init__(self):
+        super().__init__()
+        self.shape("scanner.gif")
+
+    def move(self, i):
+        self.setpos(coords[i])
+
+    def finish(self):
+        self.setpos(75, -280)
+
+    def dirty(self, i):
+        status_shapes[i].color("red")
+        
+
+# How system reacts to a window scan being dirty
+def dirty_scan(i, x, t):
+    scan.dirty(i - len(players) - 2)
+    time.sleep(t)
+    water.reclean(i)
+    time.sleep(t)
+    if x == 4:
+        x = 0
+    else:
+        x += 1
+    players[x].move(i)
+    scan.move(i - len(players))
+    time.sleep(t)
+    water.end_reclean(i)
+    time.sleep(t)
+    if x == 4:
+        x = 0
+    else:
+        x += 1
+    players[x].reclean(i)
+    scan.move(i - len(players) + 1)
 
 points = np.size(coords, 0)
-# points = 9
+# points = 16
 
 # initialise shapes
 status_shapes = list()
@@ -129,18 +179,35 @@ for i in range(len(players)):
 water = Waterdrone()
 water.start_position(150)
 
+scan = Scanner()
+scan.start_position(75)
+
 t = 0.3  # waiting time
 
-for i in range(points + 1):
+dirty_windows = [10, 16, 22]
+iter = [i for i in range(points + 1)]
+for i in dirty_windows:
+    iter.remove(i+1)
+dirty_windows_remove = list(map(lambda n: n + 2 , dirty_windows))
+
+for i in iter:
     x = i % len(players)
     if i < points:
         water.move(i)
         if i > 0:
             players[x].move(i - 1)
+        if i > len(players) :
+            scan.move(i - len(players) - 1)
+        if i in dirty_windows:
+           dirty_scan(i, x, t)
+        if i in dirty_windows_remove:
+            status_shapes[i - len(players) - 4].color("green")
+
     else:
         water.finish(i)
         time.sleep(t)
         players[x].move(i - 1)
+        scan.move(i - len(players) - 1)
         time.sleep(t)
         if x == 4:
             x = 0
@@ -149,7 +216,9 @@ for i in range(points + 1):
         order = [k for k in range(x, len(players))] + [k for k in range(x)]
         for j, m in enumerate(order):
             players[m].finish(i, j)
+            scan.move(i + j - len(players))
             time.sleep(t)
+        scan.finish()
 
     time.sleep(t)
 
