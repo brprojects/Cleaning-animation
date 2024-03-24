@@ -1,8 +1,7 @@
-# Animation for 3YP autonomous drone project
+# Animation for Autonomous Drone Project
+Animations for a multi-agent autonomous drone system where the drones clean skyscraper windows. This repository creates an animation for the basic cleaning of all the buildings' windows `cleaning_animatiom.py` and an animation of cleaning the buildings' windows with the verification scanner drones picking up on windows which are still dirty after initial cleaning `cleaning_animation_scanner.py`.
 
-## Cleaning animation
-Shows animation for basic cleaning of all the buildings' windows
+| Regular Cleaning | With Scanner Drone |
+|--------------|-------------|
+| ![cleaning](./cleaning_animation.gif) | ![cleaning with scanner](./animation_scanner.gif) |
 
-## Cleaning animation scanner
-Shows animation of cleaning the buildings' windows with the verification scanner 
-drones picking up on still dirty windows
